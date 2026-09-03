@@ -1,0 +1,20 @@
+{
+  "name": "sacware-erp",
+  "version": "1.0.0",
+  "description": "API base del modulo GES-01 de SACWare ERP",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "check": "node --check server.js && node --check src/app.js && node --check src/config/db.js && node --check src/controllers/insumosController.js && node --check src/controllers/clientesController.js && node --check src/routes/insumosRoutes.js && node --check src/routes/clientesRoutes.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.12.0"
+  }
+}
