@@ -77,8 +77,8 @@ CREATE TABLE IF NOT EXISTS ordenes_produccion (
 ) ENGINE=InnoDB;
 
 INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES
-  ('Administrador Ventas', 'admin@sacware.local', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin_ventas'),
-  ('Responsable Produccion', 'produccion@sacware.local', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'produccion')
+  ('Administrador Ventas', 'admin@sacware.local', '$2b$10$.mSuEKDAOCUA.gL8Cid0mefm0NWc4Jxf.eSPYHG3LpsNwpwvBABkq', 'admin_ventas'),
+  ('Responsable Produccion', 'produccion@sacware.local', '$2b$10$.mSuEKDAOCUA.gL8Cid0mefm0NWc4Jxf.eSPYHG3LpsNwpwvBABkq', 'produccion')
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
 
 INSERT INTO clientes (razon_social, cuit, telefono, email, direccion) VALUES

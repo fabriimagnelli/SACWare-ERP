@@ -87,4 +87,46 @@ async function crearInsumo(req, res, next) {
   }
 }
 
-module.exports = { listarInsumos, listarInsumosCriticos, crearInsumo };
+async function obtenerInsumo(req, res, next) {
+  try {
+    const [filas] = await pool.query('SELECT * FROM insumos WHERE id = ?', [req.params.id]);
+    if (filas.length === 0) return res.status(404).json({ error: 'Insumo no encontrado' });
+    return res.json(filas[0]);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function actualizarInsumo(req, res, next) {
+  const errorValidacion = validarInsumo(req.body);
+  if (errorValidacion) return res.status(400).json({ error: errorValidacion });
+  const { sku, descripcion, categoria, unidad_medida, stock_actual, stock_minimo, precio_unitario } = req.body;
+  try {
+    const [resultado] = await pool.query(
+      `UPDATE insumos SET sku = ?, descripcion = ?, categoria = ?, unidad_medida = ?,
+        stock_actual = COALESCE(?, stock_actual), stock_minimo = COALESCE(?, stock_minimo),
+        precio_unitario = COALESCE(?, precio_unitario) WHERE id = ?`,
+      [sku, descripcion, categoria, unidad_medida, stock_actual, stock_minimo, precio_unitario, req.params.id]
+    );
+    if (resultado.affectedRows === 0) return res.status(404).json({ error: 'Insumo no encontrado' });
+    return obtenerInsumo(req, res, next);
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') return res.status(409).json({ error: 'El SKU ya existe' });
+    return next(error);
+  }
+}
+
+async function eliminarInsumo(req, res, next) {
+  try {
+    const [resultado] = await pool.query('DELETE FROM insumos WHERE id = ?', [req.params.id]);
+    if (resultado.affectedRows === 0) return res.status(404).json({ error: 'Insumo no encontrado' });
+    return res.status(204).send();
+  } catch (error) {
+    if (error.code === 'ER_ROW_IS_REFERENCED_2') return res.status(409).json({ error: 'El insumo tiene pedidos asociados' });
+    return next(error);
+  }
+}
+
+module.exports = {
+  listarInsumos, listarInsumosCriticos, crearInsumo, obtenerInsumo, actualizarInsumo, eliminarInsumo
+};

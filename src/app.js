@@ -3,11 +3,16 @@ const cors = require('cors');
 const pool = require('./config/db');
 const insumosRoutes = require('./routes/insumosRoutes');
 const clientesRoutes = require('./routes/clientesRoutes');
+const authRoutes = require('./routes/authRoutes');
+const pedidosController = require('./controllers/pedidosController');
+const { verificarToken, authorize } = require('./middlewares/authMiddleware');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.use('/api/auth', authRoutes);
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -21,6 +26,7 @@ app.get('/api/health', async (_req, res) => {
 
 app.use('/api/insumos', insumosRoutes);
 app.use('/api/clientes', clientesRoutes);
+app.post('/api/pedidos', verificarToken, authorize(['admin_ventas']), pedidosController.crearPedido);
 
 app.use((error, _req, res, _next) => {
   console.error('Error no controlado:', error);
