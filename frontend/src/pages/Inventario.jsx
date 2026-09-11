@@ -1,6 +1,7 @@
 import { AlertTriangle, Boxes, RefreshCw, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import api from '../api/axios';
+import { Link } from 'react-router-dom';
+import api from '../services/api';
 
 const currency = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
 

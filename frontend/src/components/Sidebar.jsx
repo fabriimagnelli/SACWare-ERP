@@ -1,5 +1,6 @@
 import { Boxes, ClipboardList, LayoutDashboard, LogOut, PanelLeftClose, PanelLeftOpen, Warehouse } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const links = [
   { to: '/dashboard', label: 'Resumen', icon: LayoutDashboard },
@@ -9,11 +10,10 @@ const links = [
 
 export default function Sidebar({ collapsed, onToggle }) {
   const navigate = useNavigate();
-  const usuario = JSON.parse(localStorage.getItem('sacware_usuario') || '{}');
+  const { usuario, logout } = useAuth();
 
   function cerrarSesion() {
-    localStorage.removeItem('sacware_token');
-    localStorage.removeItem('sacware_usuario');
+    logout();
     navigate('/login');
   }
 
@@ -38,7 +38,7 @@ export default function Sidebar({ collapsed, onToggle }) {
       </nav>
 
       <div className={`user-block ${collapsed ? 'justify-center px-0' : ''}`}>
-        {!collapsed && <div className="min-w-0"><p className="truncate text-sm font-semibold">{usuario.nombre || 'Operador'}</p><p className="truncate text-xs text-slate-400">{usuario.rol || 'SACWare ERP'}</p></div>}
+        {!collapsed && <div className="min-w-0"><p className="truncate text-sm font-semibold">{usuario?.nombre || 'Operador'}</p><p className="truncate text-xs text-slate-400">{usuario?.rol || 'SACWare ERP'}</p></div>}
         <button className="icon-button ml-auto" onClick={cerrarSesion} aria-label="Cerrar sesión" title="Cerrar sesión"><LogOut size={17} /></button>
       </div>
     </aside>

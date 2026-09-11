@@ -11,12 +11,12 @@ const { verificarToken, authorize } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-router.use(verificarToken, authorize(['stock_compras']));
-router.get('/criticos', listarInsumosCriticos);
-router.get('/', listarInsumos);
-router.post('/', crearInsumo);
-router.get('/:id', obtenerInsumo);
-router.put('/:id', actualizarInsumo);
-router.delete('/:id', eliminarInsumo);
+router.use(verificarToken);
+router.get('/criticos', authorize(['stock_compras']), listarInsumosCriticos);
+router.get('/', authorize(['stock_compras', 'admin_ventas']), listarInsumos);
+router.post('/', authorize(['stock_compras']), crearInsumo);
+router.get('/:id', authorize(['stock_compras']), obtenerInsumo);
+router.put('/:id', authorize(['stock_compras']), actualizarInsumo);
+router.delete('/:id', authorize(['stock_compras']), eliminarInsumo);
 
 module.exports = router;

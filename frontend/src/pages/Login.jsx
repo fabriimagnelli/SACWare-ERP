@@ -1,15 +1,14 @@
 import { ArrowRight, LockKeyhole, Mail, Warehouse } from 'lucide-react';
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login, isAuthenticated, loading, error } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  if (localStorage.getItem('sacware_token')) return <Navigate to="/dashboard" replace />;
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
 
   function actualizarCampo(event) {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
@@ -17,18 +16,8 @@ export default function Login() {
 
   async function iniciarSesion(event) {
     event.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const { data } = await api.post('/auth/login', form);
-      localStorage.setItem('sacware_token', data.token);
-      localStorage.setItem('sacware_usuario', JSON.stringify(data.usuario));
-      navigate('/dashboard', { replace: true });
-    } catch (requestError) {
-      setError(requestError.response?.data?.error || 'No se pudo iniciar sesión. Revisa la conexión.');
-    } finally {
-      setLoading(false);
-    }
+    const exito = await login(form.email, form.password);
+    if (exito) navigate('/dashboard', { replace: true });
   }
 
   return (
