@@ -1,0 +1,157 @@
+{
+  "info": {
+    "_postman_id": "da07bb47-7323-4de4-97e3-5c8cc1e2636c",
+    "name": "SACWare_S4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57911078"
+  },
+  "item": [
+    {
+      "name": "01 - Login Admin",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"admin@sacware.local\",\r\n  \"password\": \"47085112\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 - Crear Pedido Exitoso",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBWZW50YXMiLCJlbWFpbCI6ImFkbWluQHNhY3dhcmUubG9jYWwiLCJyb2wiOiJhZG1pbl92ZW50YXMiLCJpYXQiOjE3ODkxMzMzMDAsImV4cCI6MTc4OTE2MjEwMH0.5F3kI_YJm0UqF6ClY45TN4rLb6sLYtuZHR4hXCRtwh8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nro_pedido\": \"PED-2026-001\",\r\n  \"cliente_id\": 1,\r\n  \"importe\": 150000.00,\r\n  \"detalles\": [\r\n    {\r\n      \"insumo_id\": 1,\r\n      \"tipologia\": \"Ventana Corrediza Herrero\",\r\n      \"ancho_mm\": 1200,\r\n      \"alto_mm\": 1100,\r\n      \"cantidad\": 2\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/pedidos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "pedidos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03 - Error Pedido Duplicado",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBWZW50YXMiLCJlbWFpbCI6ImFkbWluQHNhY3dhcmUubG9jYWwiLCJyb2wiOiJhZG1pbl92ZW50YXMiLCJpYXQiOjE3ODkxMzMzMDAsImV4cCI6MTc4OTE2MjEwMH0.5F3kI_YJm0UqF6ClY45TN4rLb6sLYtuZHR4hXCRtwh8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nro_pedido\": \"PED-2026-002\",\r\n  \"cliente_id\": 1,\r\n  \"importe\": 150000.00,\r\n  \"detalles\": [\r\n    {\r\n      \"insumo_id\": 1,\r\n      \"tipologia\": \"Ventana Corrediza Módena\",\r\n      \"ancho_mm\": 1200,\r\n      \"alto_mm\": 1100,\r\n      \"cantidad\": 9999\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/pedidos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "pedidos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 - Validacion Stock Critico",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciBWZW50YXMiLCJlbWFpbCI6ImFkbWluQHNhY3dhcmUubG9jYWwiLCJyb2wiOiJhZG1pbl92ZW50YXMiLCJpYXQiOjE3ODkxMzMzMDAsImV4cCI6MTc4OTE2MjEwMH0.5F3kI_YJm0UqF6ClY45TN4rLb6sLYtuZHR4hXCRtwh8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nro_pedido\": \"PED-2026-002\",\r\n  \"cliente_id\": 1,\r\n  \"importe\": 150000.00,\r\n  \"detalles\": [\r\n    {\r\n      \"insumo_id\": 1,\r\n      \"tipologia\": \"Ventana Corrediza Módena\",\r\n      \"ancho_mm\": 1200,\r\n      \"alto_mm\": 1100,\r\n      \"cantidad\": 9999\r\n    }\r\n  ]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/pedidos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "pedidos"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
