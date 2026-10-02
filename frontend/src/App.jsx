@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { DashboardProvider } from './context/DashboardContext';
+import { ToastProvider } from './context/ToastContext';
 import Dashboard from './pages/Dashboard';
 import Inventario from './pages/Inventario';
 import InventarioCritico from './pages/InventarioCritico';
@@ -32,7 +34,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <ToastProvider>
+        <DashboardProvider>
+          <AppRoutes />
+        </DashboardProvider>
+      </ToastProvider>
     </AuthProvider>
   );
 }

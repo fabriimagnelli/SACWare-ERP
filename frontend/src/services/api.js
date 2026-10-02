@@ -21,6 +21,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('sacware_token');
       localStorage.removeItem('sacware_usuario');
+      window.dispatchEvent(new Event('sacware_logout'));
     }
     return Promise.reject(error);
   }

@@ -1,7 +1,10 @@
-import { AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, ClipboardList, PackageSearch, Plus, Trash2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, ClipboardList, Loader2, PackageSearch, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { crearPedido, obtenerMensajeError } from '../services/pedidosService';
+import { useDashboardData } from '../context/DashboardContext';
+import { useToast } from '../context/ToastContext';
 
 const currency = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
 
@@ -9,6 +12,8 @@ const detalleVacio = { insumo_id: '', tipologia: '', ancho_mm: '', alto_mm: '', 
 
 export default function NuevoPedido() {
   const navigate = useNavigate();
+  const { success: mostrarExito } = useToast();
+  const { refresh: refrescarTablero } = useDashboardData();
   const [clientes, setClientes] = useState([]);
   const [insumos, setInsumos] = useState([]);
   const [cargandoCatalogo, setCargandoCatalogo] = useState(true);
@@ -17,7 +22,6 @@ export default function NuevoPedido() {
   const [detalles, setDetalles] = useState([{ ...detalleVacio }]);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState('');
-  const [exito, setExito] = useState('');
 
   useEffect(() => {
     setCargandoCatalogo(true);
@@ -44,6 +48,13 @@ export default function NuevoPedido() {
     setDetalles((actuales) => (actuales.length > 1 ? actuales.filter((_, i) => i !== index) : actuales));
   }
 
+  function limpiarFormulario() {
+    setClienteId('');
+    setFechaEntrega('');
+    setDetalles([{ ...detalleVacio }]);
+    setError('');
+  }
+
   const itemsConSubtotal = detalles.map((detalle) => {
     const insumo = insumosPorId.get(String(detalle.insumo_id));
     const cantidad = Number(detalle.cantidad) || 0;
@@ -57,7 +68,6 @@ export default function NuevoPedido() {
   async function enviarPedido(event) {
     event.preventDefault();
     setError('');
-    setExito('');
 
     if (!clienteId) {
       setError('Selecciona un cliente.');
@@ -86,11 +96,13 @@ export default function NuevoPedido() {
 
     setEnviando(true);
     try {
-      const { data } = await api.post('/pedidos', payload);
-      setExito(`Pedido ${data.nro_pedido || ''} creado correctamente.`);
+      const pedido = await crearPedido(payload);
+      mostrarExito(`Pedido ${pedido.nro_pedido} confirmado — Orden de producción ${pedido.nro_op} emitida.`);
+      limpiarFormulario();
+      refrescarTablero();
       setTimeout(() => navigate('/pedidos'), 1200);
     } catch (requestError) {
-      setError(requestError.response?.data?.error || 'No se pudo crear el pedido.');
+      setError(obtenerMensajeError(requestError, 'No se pudo crear el pedido. Revisa la conexión.'));
     } finally {
       setEnviando(false);
     }
@@ -113,7 +125,7 @@ export default function NuevoPedido() {
         <div style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
           <label className="field-label">Cliente
             <div className="input-wrap">
-              <select value={clienteId} onChange={(event) => setClienteId(event.target.value)} required disabled={cargandoCatalogo} style={{ background: 'transparent', border: 0, color: '#edf9f7', outline: 0, width: '100%' }}>
+              <select value={clienteId} onChange={(event) => setClienteId(event.target.value)} required disabled={cargandoCatalogo || enviando} style={{ background: 'transparent', border: 0, color: '#edf9f7', outline: 0, width: '100%' }}>
                 <option value="">{cargandoCatalogo ? 'Cargando clientes...' : 'Selecciona un cliente'}</option>
                 {clientes.map((cliente) => (
                   <option key={cliente.id} value={cliente.id}>{cliente.razon_social}</option>
@@ -123,7 +135,7 @@ export default function NuevoPedido() {
           </label>
           <label className="field-label">Fecha de entrega estimada
             <div className="input-wrap">
-              <input type="date" value={fechaEntrega} onChange={(event) => setFechaEntrega(event.target.value)} />
+              <input type="date" value={fechaEntrega} onChange={(event) => setFechaEntrega(event.target.value)} disabled={enviando} />
             </div>
           </label>
         </div>
@@ -131,7 +143,7 @@ export default function NuevoPedido() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <h2 className="font-display text-lg font-semibold text-white">Ítems del pedido</h2>
-            <button type="button" className="secondary-button" onClick={agregarDetalle}><Plus size={15} /> Agregar ítem</button>
+            <button type="button" className="secondary-button" onClick={agregarDetalle} disabled={enviando}><Plus size={15} /> Agregar ítem</button>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -147,7 +159,7 @@ export default function NuevoPedido() {
                           value={detalle.insumo_id}
                           onChange={(event) => actualizarDetalle(index, 'insumo_id', event.target.value)}
                           required
-                          disabled={cargandoCatalogo}
+                          disabled={cargandoCatalogo || enviando}
                           style={{ background: 'transparent', border: 0, color: '#edf9f7', outline: 0, width: '100%' }}
                         >
                           <option value="">{cargandoCatalogo ? 'Cargando insumos...' : 'Selecciona un insumo'}</option>
@@ -160,18 +172,18 @@ export default function NuevoPedido() {
                       </div>
                     </label>
                     <label className="field-label">Tipología
-                      <div className="input-wrap"><input type="text" value={detalle.tipologia} onChange={(event) => actualizarDetalle(index, 'tipologia', event.target.value)} placeholder="Corrediza 2 hojas" required /></div>
+                      <div className="input-wrap"><input type="text" value={detalle.tipologia} onChange={(event) => actualizarDetalle(index, 'tipologia', event.target.value)} placeholder="Corrediza 2 hojas" required disabled={enviando} /></div>
                     </label>
                     <label className="field-label">Ancho (mm)
-                      <div className="input-wrap"><input type="number" min="1" value={detalle.ancho_mm} onChange={(event) => actualizarDetalle(index, 'ancho_mm', event.target.value)} required /></div>
+                      <div className="input-wrap"><input type="number" min="1" value={detalle.ancho_mm} onChange={(event) => actualizarDetalle(index, 'ancho_mm', event.target.value)} required disabled={enviando} /></div>
                     </label>
                     <label className="field-label">Alto (mm)
-                      <div className="input-wrap"><input type="number" min="1" value={detalle.alto_mm} onChange={(event) => actualizarDetalle(index, 'alto_mm', event.target.value)} required /></div>
+                      <div className="input-wrap"><input type="number" min="1" value={detalle.alto_mm} onChange={(event) => actualizarDetalle(index, 'alto_mm', event.target.value)} required disabled={enviando} /></div>
                     </label>
                     <label className="field-label">Cantidad
-                      <div className="input-wrap"><input type="number" min="1" value={detalle.cantidad} onChange={(event) => actualizarDetalle(index, 'cantidad', event.target.value)} required /></div>
+                      <div className="input-wrap"><input type="number" min="1" value={detalle.cantidad} onChange={(event) => actualizarDetalle(index, 'cantidad', event.target.value)} required disabled={enviando} /></div>
                     </label>
-                    <button type="button" className="icon-button" onClick={() => quitarDetalle(index)} disabled={detalles.length === 1} aria-label="Quitar ítem"><Trash2 size={17} /></button>
+                    <button type="button" className="icon-button" onClick={() => quitarDetalle(index)} disabled={detalles.length === 1 || enviando} aria-label="Quitar ítem"><Trash2 size={17} /></button>
                   </div>
                   {insumo && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: excedeStock ? '#ffaaa0' : '#7cc6b7', paddingLeft: 4 }}>
@@ -191,13 +203,12 @@ export default function NuevoPedido() {
         </div>
 
         {error && <p className="form-error" role="alert"><AlertTriangle size={14} style={{ display: 'inline', marginRight: 6 }} />{error}</p>}
-        {exito && <p className="feedback" style={{ background: 'rgba(126,225,191,.12)', border: '1px solid rgba(126,225,191,.2)', color: '#9ce6cc' }}><CheckCircle2 size={16} />{exito}</p>}
 
         <button className="primary-button" type="submit" disabled={enviando || cargandoCatalogo} style={{ alignSelf: 'flex-start' }}>
-          <ClipboardList size={17} /> {enviando ? 'Enviando...' : 'Crear pedido'}
+          {enviando ? <Loader2 size={17} className="animate-spin" /> : <ClipboardList size={17} />}
+          {enviando ? 'Enviando...' : 'Crear pedido'}
         </button>
       </form>
     </div>
   );
 }
-

@@ -6,6 +6,30 @@ const AuthContext = createContext(null);
 const TOKEN_KEY = 'sacware_token';
 const USER_KEY = 'sacware_usuario';
 
+function leerTokenAlmacenado() {
+  try {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) return null;
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      return null;
+    }
+    const payload = JSON.parse(atob(parts[1]));
+    if (payload.exp && payload.exp * 1000 <= Date.now()) {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      return null;
+    }
+    return token;
+  } catch {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    return null;
+  }
+}
+
 function leerUsuarioAlmacenado() {
   try {
     const crudo = localStorage.getItem(USER_KEY);
@@ -16,10 +40,19 @@ function leerUsuarioAlmacenado() {
 }
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY));
-  const [usuario, setUsuario] = useState(leerUsuarioAlmacenado);
+  const [token, setToken] = useState(leerTokenAlmacenado);
+  const [usuario, setUsuario] = useState(() => (leerTokenAlmacenado() ? leerUsuarioAlmacenado() : null));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    function onLogout() {
+      setToken(null);
+      setUsuario(null);
+    }
+    window.addEventListener('sacware_logout', onLogout);
+    return () => window.removeEventListener('sacware_logout', onLogout);
+  }, []);
 
   useEffect(() => {
     if (token) localStorage.setItem(TOKEN_KEY, token);

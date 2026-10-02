@@ -12,8 +12,8 @@ const { verificarToken, authorize } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 router.use(verificarToken);
-router.get('/criticos', authorize(['stock_compras']), listarInsumosCriticos);
-router.get('/', authorize(['stock_compras', 'admin_ventas']), listarInsumos);
+router.get('/criticos', authorize(['stock_compras', 'admin_ventas', 'produccion']), listarInsumosCriticos);
+router.get('/', authorize(['stock_compras', 'admin_ventas', 'produccion']), listarInsumos);
 router.post('/', authorize(['stock_compras']), crearInsumo);
 router.get('/:id', authorize(['stock_compras']), obtenerInsumo);
 router.put('/:id', authorize(['stock_compras']), actualizarInsumo);
