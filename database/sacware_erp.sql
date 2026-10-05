@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS ordenes_produccion (
   pedido_id INT UNSIGNED NOT NULL,
   responsable_id INT UNSIGNED NULL,
   estado ENUM('pendiente', 'corte', 'armado', 'vidriado', 'finalizado') NOT NULL DEFAULT 'pendiente',
+  stock_descontado BOOLEAN NOT NULL DEFAULT FALSE,
   fecha_inicio DATETIME,
   fecha_fin DATETIME,
   creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -91,5 +92,7 @@ INSERT INTO insumos (sku, descripcion, categoria, unidad_medida, stock_actual, s
   ('PERF-AL-MARCO', 'Perfil aluminio marco corredizo', 'perfil', 'metro', 12.00, 20.00, 7200.00),
   ('DVH-4-9-4', 'Vidrio DVH 4/9/4 transparente', 'vidrio_dvh', 'm2', 6.50, 10.00, 42000.00),
   ('SELL-SILICONA', 'Sellador silicona neutra para aberturas', 'accesorio', 'unidad', 8.00, 15.00, 6500.00),
-  ('SELL-POLIURETANO', 'Sellador poliuretano exterior', 'accesorio', 'unidad', 5.00, 10.00, 8900.00)
+  ('SELL-POLIURETANO', 'Sellador poliuretano exterior', 'accesorio', 'unidad', 5.00, 10.00, 8900.00),
+  ('ACC-ESCUADRA', 'Escuadra de alineación y armado', 'accesorio', 'unidad', 100.00, 20.00, 850.00),
+  ('ACC-RODAMIENTO', 'Rodamiento a rulemán regulable', 'accesorio', 'unidad', 80.00, 16.00, 1450.00)
 ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion), stock_minimo = VALUES(stock_minimo);

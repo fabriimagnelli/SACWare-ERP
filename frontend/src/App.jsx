@@ -9,6 +9,7 @@ import InventarioCritico from './pages/InventarioCritico';
 import Login from './pages/Login';
 import NuevoPedido from './pages/NuevoPedido';
 import Pedidos from './pages/Pedidos';
+import Taller from './pages/Taller';
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAuth();
@@ -23,6 +24,8 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pedidos" element={<Pedidos />} />
         <Route path="/pedidos/nuevo" element={<NuevoPedido />} />
+        <Route path="/taller" element={<Taller />} />
+        <Route path="/produccion" element={<Navigate to="/taller" replace />} />
         <Route path="/inventario" element={<Inventario />} />
         <Route path="/inventario/criticos" element={<InventarioCritico />} />
       </Route>

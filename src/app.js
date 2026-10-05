@@ -5,6 +5,7 @@ const insumosRoutes = require('./routes/insumosRoutes');
 const clientesRoutes = require('./routes/clientesRoutes');
 const authRoutes = require('./routes/authRoutes');
 const pedidosRoutes = require('./routes/pedidosRoutes');
+const ordenesProduccionRoutes = require('./routes/ordenesProduccionRoutes');
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.get('/api/health', async (_req, res) => {
 app.use('/api/insumos', insumosRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/pedidos', pedidosRoutes);
+app.use('/api/ordenes-produccion', ordenesProduccionRoutes);
 
 app.use((error, _req, res, _next) => {
   console.error('Error no controlado:', error);

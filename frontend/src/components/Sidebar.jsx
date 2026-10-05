@@ -1,10 +1,11 @@
-import { Boxes, ClipboardList, LayoutDashboard, LogOut, PanelLeftClose, PanelLeftOpen, Warehouse } from 'lucide-react';
+import { Boxes, ClipboardList, Hammer, LayoutDashboard, LogOut, PanelLeftClose, PanelLeftOpen, Warehouse } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const links = [
   { to: '/dashboard', label: 'Resumen', icon: LayoutDashboard },
   { to: '/pedidos', label: 'Pedidos', icon: ClipboardList },
+  { to: '/taller', label: 'Taller', icon: Hammer },
   { to: '/inventario', label: 'Inventario', icon: Boxes }
 ];
 
